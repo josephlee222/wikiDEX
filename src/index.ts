@@ -4,6 +4,12 @@ import { Request, Response } from "express"
 import { AppDataSource } from "./data-source"
 import { Routes } from "./routes"
 import { User } from "./entity/User"
+import { Config } from "./entity/Config"
+import * as dotenv from "dotenv"
+
+dotenv.config();
+
+const PORT = process.env.WIKIDEX_PORT || 3000;
 
 AppDataSource.initialize().then(async () => {
 
@@ -28,25 +34,21 @@ AppDataSource.initialize().then(async () => {
     // ...
 
     // start express server
-    app.listen(3000)
+    app.listen(PORT)
 
-    // insert new users for test
-    await AppDataSource.manager.save(
-        AppDataSource.manager.create(User, {
-            firstName: "Timber",
-            lastName: "Saw",
-            age: 27
-        })
-    )
+    // check if config entries exist, if not create them
+    const configRepository = AppDataSource.getRepository(Config);
+    const configKeys = ["WIKIDEX_NAME", "WIKIDEX_VERSION", "WIKIDEX_DESCRIPTION", "WIKIDEX_AUTHOR"];
+    for (const key of configKeys) {
+        let config = await configRepository.findOneBy({ key });
+        if (!config) {
+            config = new Config();
+            config.key = key;
+            config.value = process.env[key] || "";
+            await configRepository.save(config);
+        }
+    }
 
-    await AppDataSource.manager.save(
-        AppDataSource.manager.create(User, {
-            firstName: "Phantom",
-            lastName: "Assassin",
-            age: 24
-        })
-    )
 
-    console.log("Express server has started on port 3000. Open http://localhost:3000/users to see results")
-
+    console.log(`Express server has started on port ${PORT}. Open http://localhost:${PORT}/users to see results`)
 }).catch(error => console.log(error))

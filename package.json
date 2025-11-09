@@ -9,11 +9,12 @@
       "typescript": "^5.8.2"
    },
    "dependencies": {
-      "reflect-metadata": "^0.2.2",
-      "typeorm": "0.3.27",
-      "mysql2": "^3.14.0",
+      "body-parser": "^1.20.3",
+      "dotenv": "^17.2.3",
       "express": "^4.21.2",
-      "body-parser": "^1.20.3"
+      "mysql2": "^3.14.0",
+      "reflect-metadata": "^0.2.2",
+      "typeorm": "0.3.27"
    },
    "scripts": {
       "start": "ts-node src/index.ts",
